@@ -1,0 +1,2 @@
+# OOP_Midterms_HackerRank_Easy
+MIDTERM_Algorithm_EasyLevel
