@@ -20,35 +20,59 @@ class Result
      * The function is expected to return an INTEGER.
      * The function accepts 2D_INTEGER_ARRAY intervals as parameter.
      *
-     * Rule: Find the largest subset such that no point is covered by more than 2 intervals.
+     * We select the maximum number of intervals so that no point
+     * is covered by 3 or more chosen intervals (i.e. at most 2 overlaps).
      */
-
     public static int intervalSelection(List<List<int>> intervals)
     {
-     
-        intervals = intervals.OrderBy(x => x[1]).ThenBy(x => x[0]).ToList();
+      
+        var list = new List<(long start, long end)>(intervals.Count);
+        foreach (var it in intervals)
+            list.Add((it[0], it[1]));
 
-     
-        List<int> active = new List<int>();
-        int count = 0;
-
-        foreach (var interval in intervals)
+      
+        list.Sort((a, b) =>
         {
-            int start = interval[0];
-            int end = interval[1];
+            int c = a.start.CompareTo(b.start);
+            if (c != 0) return c;
+            return a.end.CompareTo(b.end);
+        });
 
-           
-            active = active.Where(e => e >= start).ToList();
+       
+        var comparer = Comparer<(long end, int id)>.Create((x, y) =>
+        {
+            int c = x.end.CompareTo(y.end);
+            if (c != 0) return c;
+            return x.id.CompareTo(y.id);
+        });
 
-            if (active.Count < 2)
+        var active = new SortedSet<(long end, int id)>(comparer);
+
+        int idCounter = 0;
+        int kept = 0;
+
+        foreach (var (start, end) in list)
+        {
+          
+            while (active.Count > 0 && active.Min.end < start)
             {
-                active.Add(end);
-                active.Sort();
-                count++;
+                active.Remove(active.Min);
+            }
+
+            
+            active.Add((end, idCounter++));
+            kept++;
+
+          
+            if (active.Count > 2)
+            {
+                var toRemove = active.Max;
+                active.Remove(toRemove);
+                kept--;
             }
         }
 
-        return count;
+        return kept;
     }
 }
 
@@ -68,8 +92,7 @@ class Solution
 
             for (int i = 0; i < n; i++)
             {
-                intervals.Add(Console.ReadLine().TrimEnd().Split(' ')
-                    .ToList().Select(intervalsTemp => Convert.ToInt32(intervalsTemp)).ToList());
+                intervals.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(intervalsTemp => Convert.ToInt32(intervalsTemp)).ToList());
             }
 
             int result = Result.intervalSelection(intervals);
