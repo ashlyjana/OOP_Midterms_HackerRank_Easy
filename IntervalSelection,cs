@@ -1,0 +1,83 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+    /*
+     * Complete the 'intervalSelection' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts 2D_INTEGER_ARRAY intervals as parameter.
+     *
+     * Rule: Find the largest subset such that no point is covered by more than 2 intervals.
+     */
+
+    public static int intervalSelection(List<List<int>> intervals)
+    {
+     
+        intervals = intervals.OrderBy(x => x[1]).ThenBy(x => x[0]).ToList();
+
+     
+        List<int> active = new List<int>();
+        int count = 0;
+
+        foreach (var interval in intervals)
+        {
+            int start = interval[0];
+            int end = interval[1];
+
+           
+            active = active.Where(e => e >= start).ToList();
+
+            if (active.Count < 2)
+            {
+                active.Add(end);
+                active.Sort();
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int s = Convert.ToInt32(Console.ReadLine().Trim());
+
+        for (int sItr = 0; sItr < s; sItr++)
+        {
+            int n = Convert.ToInt32(Console.ReadLine().Trim());
+
+            List<List<int>> intervals = new List<List<int>>();
+
+            for (int i = 0; i < n; i++)
+            {
+                intervals.Add(Console.ReadLine().TrimEnd().Split(' ')
+                    .ToList().Select(intervalsTemp => Convert.ToInt32(intervalsTemp)).ToList());
+            }
+
+            int result = Result.intervalSelection(intervals);
+
+            textWriter.WriteLine(result);
+        }
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
