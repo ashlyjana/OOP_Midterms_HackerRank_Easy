@@ -14,7 +14,6 @@ using System;
 
 class Result
 {
-
     /*
      * Complete the 'miniMaxSum' function below.
      *
@@ -23,21 +22,33 @@ class Result
 
     public static void miniMaxSum(List<int> arr)
     {
-         long min = arr.Min();
-         long max = arr.Max();
-         long sum = arr.Sum();
-         Console.WriteLine((sum - max) + " " + (sum - min));
+        long sum = 0;
+        int min = arr[0];
+        int max = arr[0];
 
+        foreach (int num in arr)
+        {
+            sum += num;
+            if (num < min) min = num;
+            if (num > max) max = num;
+        }
+
+        long minSum = sum - max;
+        long maxSum = sum - min;
+
+        Console.WriteLine(minSum + " " + maxSum);
     }
-
 }
 
 class Solution
 {
     public static void Main(string[] args)
     {
-
-        List<int> arr = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt32(arrTemp)).ToList();
+        List<int> arr = Console.ReadLine()
+                               .Trim()
+                               .Split(' ')
+                               .Select(int.Parse)
+                               .ToList();
 
         Result.miniMaxSum(arr);
     }
